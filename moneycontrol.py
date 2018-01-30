@@ -47,7 +47,7 @@ class MoneyControl(object):
         raw_links = annoucement_soup.find_all("a", attrs={"class":"bl_15"})
         list_of_links = []
         for x in raw_links:
-            list_of_links.append(x['href'])
+            list_of_links.append(PREFIX_URL + x['href'])
         return list_of_links
 
     def fetch_news(self):
