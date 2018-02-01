@@ -45,9 +45,19 @@ class MoneyControl(object):
         r = requests.get(self.more_anno_link)
         annoucement_soup = bs4.BeautifulSoup(r.content, 'html.parser')
         raw_links = annoucement_soup.find_all("a", attrs={"class":"bl_15"})
+        
+        # List of links of all the annoucements
         list_of_links = []
         for x in raw_links:
-            list_of_links.append(PREFIX_URL + x['href'])
+            link = PREFIX_URL + x['href']
+            list_of_links.append(link)
+            a = requests.get(PREFIX_URL + x['href'])
+            anno_page = bs4.BeautifulSoup(a.content, "html.parser")
+            date = next(anno_page.find("p", attrs={"class":"gL_10"}).children)
+            title = anno_page.find("span", attrs={"class":"bl_15"}).text
+            content = ""
+            pdf_link = ""
+            print(title)
         return list_of_links
 
     def fetch_news(self):
