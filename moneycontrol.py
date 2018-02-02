@@ -48,20 +48,37 @@ class MoneyControl(object):
         
         # List of links of all the annoucements
         list_of_links = []
+        self.announcements = []
         for x in raw_links:
             link = PREFIX_URL + x['href']
             list_of_links.append(link)
             a = requests.get(PREFIX_URL + x['href'])
             anno_page = bs4.BeautifulSoup(a.content, "html.parser")
+
+            pdf_link = None
+            title = None
+            content = None
+
             date = next(anno_page.find("p", attrs={"class":"gL_10"}).children)
-            title = anno_page.find("span", attrs={"class":"bl_15"}).text
-            content = ""
-            pdf_link = ""
-            print(title)
-        return list_of_links
+            
+            # Checking whether the title of the annoucement is available or not
+            if anno_page.find("span", attrs={"class":"bl_15"}):
+                title = anno_page.find("span", attrs={"class":"bl_15"}).text
+
+            # Checking whether content is available or not
+            if anno_page.find("p", attrs={"class":"PT10 b_12"}):
+                content = anno_page.find("p", attrs={"class":"PT10 b_12"}).text
+             
+            # Checking whether the PDF link is availableor not
+            if anno_page.find("p", attrs={"class":"PT5"}).find("a"):
+                pdf_link = PREFIX_URL + anno_page.find("p", attrs={"class":"PT5"}).find("a")["href"]
+
+            anno = {"link":link, "pdf_link":pdf_link, "content":content, "title":title, "date":date}
+            self.announcements.append(anno)
 
     def fetch_news(self):
         pass
 
-a = MoneyControl("ril")
-print(a.fetch_annoucement())
+a = MoneyControl("ongc")
+a.fetch_annoucement()
+print(a.announcements)
