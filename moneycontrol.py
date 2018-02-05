@@ -8,7 +8,12 @@ PREFIX_URL = "http://www.moneycontrol.com"
 class MoneyControl(object):
 
     def __init__(self, ticker):
+        
+        # Declaring all the instance variable for the class
         self.ticker = ticker
+        self.announcements = []     # Stores the announcements listed on the first page
+        self.announcements_pages = []     # Stores the link of all the pages in the announcement section
+
         self.fetch_ticker()
 
     def fetch_ticker(self):
@@ -76,9 +81,9 @@ class MoneyControl(object):
             anno = {"link":link, "pdf_link":pdf_link, "content":content, "title":title, "date":date}
             self.announcements.append(anno)
 
-    def fetch_news(self):
-        pass
 
-a = MoneyControl("ongc")
-a.fetch_annoucement()
-print(a.announcements)
+
+if __name__ == "__main__":
+    a = MoneyControl("ongc")
+    a.fetch_annoucement()
+    print(a.announcements)
