@@ -13,12 +13,16 @@ class MoneyControl(object):
         self.ticker = ticker
         self.announcements = []     # Stores the announcements listed on the first page
         self.announcements_pages = []     # Stores the link of all the pages in the announcement section
+        self.more_anno_link = ""    # Link of the announcement page for the company
+        self.more_news_link = ""    # Link of news page for the company
+        self.link = ""      # Link to the front page of the company we are looking for on moneycontrol
 
         self.fetch_ticker()
 
     def fetch_ticker(self):
         try:
-            r = requests.get(SEARCH_URL+self.ticker)
+            self.link = SEARCH_URL+self.ticker
+            r = requests.get(self.link)
             if r.status_code==200:
                 print("Fetched page for ticker : "+self.ticker)
                 # Creating a bs4 object to store the contents of the requested page
@@ -46,12 +50,12 @@ class MoneyControl(object):
             print("Any type of request related error : "+str(oe))
             raise Exception
 
-    def fetch_annoucement(self):
+    def fetch_announcement(self):
         r = requests.get(self.more_anno_link)
-        annoucement_soup = bs4.BeautifulSoup(r.content, 'html.parser')
-        raw_links = annoucement_soup.find_all("a", attrs={"class":"bl_15"})
+        announcement_soup = bs4.BeautifulSoup(r.content, 'html.parser')
+        raw_links = announcement_soup.find_all("a", attrs={"class":"bl_15"})
         
-        # List of links of all the annoucements
+        # List of links of all the announcements
         list_of_links = []
         self.announcements = []
         for x in raw_links:
@@ -66,7 +70,7 @@ class MoneyControl(object):
 
             date = next(anno_page.find("p", attrs={"class":"gL_10"}).children)
             
-            # Checking whether the title of the annoucement is available or not
+            # Checking whether the title of the announcement is available or not
             if anno_page.find("span", attrs={"class":"bl_15"}):
                 title = anno_page.find("span", attrs={"class":"bl_15"}).text
 
@@ -85,5 +89,5 @@ class MoneyControl(object):
 
 if __name__ == "__main__":
     a = MoneyControl("ongc")
-    a.fetch_annoucement()
+    a.fetch_announcement()
     print(a.announcements)
