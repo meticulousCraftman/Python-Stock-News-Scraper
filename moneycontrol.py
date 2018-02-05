@@ -15,6 +15,7 @@ class MoneyControl(object):
         self.announcements_pages = []     # Stores the link of all the pages in the announcement section
         self.more_anno_link = ""    # Link of the announcement page for the company
         self.more_news_link = ""    # Link of news page for the company
+        self.__template_next_announcement_page = ""     # For storing the link of the next page of the announcement
         self.link = ""      # Link to the front page of the company we are looking for on moneycontrol
 
         self.fetch_ticker()
@@ -51,11 +52,13 @@ class MoneyControl(object):
             raise Exception
 
     def fetch_announcement(self):
+        
         r = requests.get(self.more_anno_link)
+
         announcement_soup = bs4.BeautifulSoup(r.content, 'html.parser')
         raw_links = announcement_soup.find_all("a", attrs={"class":"bl_15"})
         
-        # List of links of all the announcements
+        # List of links of all the announcements on the given page
         list_of_links = []
         self.announcements = []
         for x in raw_links:
@@ -82,8 +85,26 @@ class MoneyControl(object):
             if anno_page.find("p", attrs={"class":"PT5"}).find("a"):
                 pdf_link = PREFIX_URL + anno_page.find("p", attrs={"class":"PT5"}).find("a")["href"]
 
+            # Checking whether the link for the next page is available or not
+            if anno_page.find("div", attrs={"class":"gray2_11"}):
+                self.__template_next_announcement_page = PREFIX_URL + anno_page.find("div", attrs={"class":"gray2_11"}).find_all("a")[1]["href"][0:-1]    # Removing the page no. of the given link so that it becomes general link
+
             anno = {"link":link, "pdf_link":pdf_link, "content":content, "title":title, "date":date}
             self.announcements.append(anno)
+
+
+        return self.announcements
+
+    def has_announcements(self, link):
+        # This method can be made much faster if it only checks for one announcement instead of building a list for it
+        result = False
+        r = requests.get(link)
+        soup = bs4.BeautifulSoup(r.content, "html.parser")
+        a = soup.find_all("p", attrs={"class":"gL_10"})     # Finding the list of the all the dates available on the page
+        if len(a)>0:
+            result = True
+
+        return result
 
 
 
