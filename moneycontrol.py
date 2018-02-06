@@ -15,7 +15,8 @@ class MoneyControl(object):
         self.announcements_pages = []     # Stores the link of all the pages in the announcement section
         self.more_anno_link = ""    # Link of the announcement page for the company
         self.more_news_link = ""    # Link of news page for the company
-        self.__template_next_announcement_page = ""     # For storing the link of the next page of the announcement
+        self.template_next_announcement_page = ""     # For storing the link of the next page of the announcement
+        self.announcement_pages = []    # Stores the list of all the announcement pages.
         self.link = ""      # Link to the front page of the company we are looking for on moneycontrol
 
         self.fetch_ticker()
@@ -52,7 +53,7 @@ class MoneyControl(object):
             raise Exception
 
     def fetch_announcement(self):
-        
+
         r = requests.get(self.more_anno_link)
 
         announcement_soup = bs4.BeautifulSoup(r.content, 'html.parser')
@@ -86,8 +87,9 @@ class MoneyControl(object):
                 pdf_link = PREFIX_URL + anno_page.find("p", attrs={"class":"PT5"}).find("a")["href"]
 
             # Checking whether the link for the next page is available or not
-            if anno_page.find("div", attrs={"class":"gray2_11"}):
-                self.__template_next_announcement_page = PREFIX_URL + anno_page.find("div", attrs={"class":"gray2_11"}).find_all("a")[1]["href"][0:-1]    # Removing the page no. of the given link so that it becomes general link
+            if len(announcement_soup.find("div", attrs={"class":"gray2_11"}).find_all("a")) > 0:
+                a = announcement_soup.find("div", attrs={"class":"gray2_11"}).find_all("a")[0]["href"]
+                self.template_next_announcement_page = PREFIX_URL + a[0:-1]    # Removing the page no. of the given link so that it becomes general link
 
             anno = {"link":link, "pdf_link":pdf_link, "content":content, "title":title, "date":date}
             self.announcements.append(anno)
@@ -96,7 +98,6 @@ class MoneyControl(object):
         return self.announcements
 
     def has_announcements(self, link):
-        # This method can be made much faster if it only checks for one announcement instead of building a list for it
         result = False
         r = requests.get(link)
         soup = bs4.BeautifulSoup(r.content, "html.parser")
@@ -106,6 +107,18 @@ class MoneyControl(object):
 
         return result
 
+    def fetch_announcement_next_pages(self):
+        i = 2
+        # fetch the announcement on first page only when this instance variable is empty
+        if self.template_next_announcement_page == "":
+            self.fetch_announcement()
+        link = self.template_next_announcement_page+str(i)
+        while self.has_announcements(link):
+            link = self.template_next_announcement_page+str(i)
+            print("Page added : "+str(i))
+            self.announcement_pages.append(link)
+            i += 1  # Keep incrementing the value of i to check the next page
+        return self.announcement_pages
 
 
 if __name__ == "__main__":
