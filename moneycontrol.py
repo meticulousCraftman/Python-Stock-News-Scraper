@@ -11,7 +11,7 @@ class MoneyControl(object):
         
         # Declaring all the instance variable for the class
         self.ticker = ticker
-        self.announcements = []     # Stores the announcements listed on the first page
+        self.a = []     # Stores the announcements listed on the given page
         self.announcements_pages = []     # Stores the link of all the pages in the announcement section
         self.more_anno_link = ""    # Link of the announcement page for the company
         self.more_news_link = ""    # Link of news page for the company
@@ -22,6 +22,7 @@ class MoneyControl(object):
 
         self.fetch_ticker()
         self.__fetch_a_next_page_link()
+        
 
     def fetch_ticker(self):
         try:
@@ -54,6 +55,7 @@ class MoneyControl(object):
             print("Any type of request related error : "+str(oe))
             raise Exception
 
+
     def __fetch_a_next_page_link(self):
 
         # Fetches the template URL for fetching different announcement pages
@@ -64,6 +66,7 @@ class MoneyControl(object):
             a = announcement_soup.find("div", attrs={"class":"gray2_11"}).find_all("a")[0]["href"]
             self.template_next_a_page = PREFIX_URL + a[0:-1]    # Removing the page no. of the given link so that it becomes general link
 
+
     def fetch_a(self):
 
         r = requests.get(self.more_anno_link)
@@ -73,7 +76,6 @@ class MoneyControl(object):
         
         # List of links of all the announcements on the given page
         list_of_links = []
-        self.announcements = []
         for x in raw_links:
             link = PREFIX_URL + x['href']
             list_of_links.append(link)
@@ -100,10 +102,11 @@ class MoneyControl(object):
 
 
             anno = {"link":link, "pdf_link":pdf_link, "content":content, "title":title, "date":date}
-            self.announcements.append(anno)
+            self.a.append(anno)
 
 
-        return self.announcements
+        return self.a
+
 
     def has_a(self, link):
         result = False
@@ -115,13 +118,14 @@ class MoneyControl(object):
 
         return result
 
-    def fetch_announcement_next_pages(self):
+
+    def fetch_all_a_pages(self):
         i = 2
         # fetch the announcement on first page only when this instance variable is empty
         if self.template_next_a_page == "":
-            self.fetch_announcement()
+            self.fetch_a()
         link = self.template_next_a_page+str(i)
-        while self.has_announcements(link):
+        while self.has_a(link):
             link = self.template_next_a_page+str(i)
             print("Page added : "+str(i))
             self.announcement_pages.append(link)
