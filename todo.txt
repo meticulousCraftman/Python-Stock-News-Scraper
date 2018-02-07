@@ -1,6 +1,0 @@
-Todo for the equity project :
-
-* Displaying data fetched from sites on a Django instance
-* Storing the announcement data in Mongo DB
-* Using react.js to build the UI of the website
-* Adding search functionality to the website for searching news and announcement
