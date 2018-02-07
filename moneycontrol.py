@@ -15,7 +15,7 @@ class MoneyControl(object):
         self.announcements_pages = []     # Stores the link of all the pages in the announcement section
         self.more_anno_link = ""    # Link of the announcement page for the company
         self.more_news_link = ""    # Link of news page for the company
-        self.template_next_announcement_page = ""     # For storing the link of the next page of the announcement
+        self.template_next_a_page = ""     # For storing the link of the next page of the announcement
         self.announcement_pages = []    # Stores the list of all the announcement pages.
         self.link = ""      # Link to the front page of the company we are looking for on moneycontrol
         self.present_a_page = 0
@@ -62,7 +62,7 @@ class MoneyControl(object):
         # Checking whether the link for the next page is available or not
         if len(announcement_soup.find("div", attrs={"class":"gray2_11"}).find_all("a")) > 0:
             a = announcement_soup.find("div", attrs={"class":"gray2_11"}).find_all("a")[0]["href"]
-            self.template_next_announcement_page = PREFIX_URL + a[0:-1]    # Removing the page no. of the given link so that it becomes general link
+            self.template_next_a_page = PREFIX_URL + a[0:-1]    # Removing the page no. of the given link so that it becomes general link
 
     def fetch_a(self):
 
@@ -118,11 +118,11 @@ class MoneyControl(object):
     def fetch_announcement_next_pages(self):
         i = 2
         # fetch the announcement on first page only when this instance variable is empty
-        if self.template_next_announcement_page == "":
+        if self.template_next_a_page == "":
             self.fetch_announcement()
-        link = self.template_next_announcement_page+str(i)
+        link = self.template_next_a_page+str(i)
         while self.has_announcements(link):
-            link = self.template_next_announcement_page+str(i)
+            link = self.template_next_a_page+str(i)
             print("Page added : "+str(i))
             self.announcement_pages.append(link)
             i += 1  # Keep incrementing the value of i to check the next page
