@@ -52,7 +52,7 @@ class MoneyControl(object):
             print("Any type of request related error : "+str(oe))
             raise Exception
 
-    def fetch_announcement(self):
+    def fetch_a(self):
 
         r = requests.get(self.more_anno_link)
 
@@ -97,7 +97,7 @@ class MoneyControl(object):
 
         return self.announcements
 
-    def has_announcements(self, link):
+    def has_a(self, link):
         result = False
         r = requests.get(link)
         soup = bs4.BeautifulSoup(r.content, "html.parser")
@@ -120,8 +120,11 @@ class MoneyControl(object):
             i += 1  # Keep incrementing the value of i to check the next page
         return self.announcement_pages
 
+    def announcement_next_page(self):
+        pass
+
 
 if __name__ == "__main__":
     a = MoneyControl("ongc")
-    a.fetch_announcement()
+    a.fetch_a()
     print(a.announcements)
