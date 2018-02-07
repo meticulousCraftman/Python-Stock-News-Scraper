@@ -119,12 +119,3 @@ class MoneyControl(object):
             self.announcement_pages.append(link)
             i += 1  # Keep incrementing the value of i to check the next page
         return self.announcement_pages
-
-    def announcement_next_page(self):
-        pass
-
-
-if __name__ == "__main__":
-    a = MoneyControl("ongc")
-    a.fetch_a()
-    print(a.announcements)
