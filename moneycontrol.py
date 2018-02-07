@@ -18,8 +18,10 @@ class MoneyControl(object):
         self.template_next_announcement_page = ""     # For storing the link of the next page of the announcement
         self.announcement_pages = []    # Stores the list of all the announcement pages.
         self.link = ""      # Link to the front page of the company we are looking for on moneycontrol
+        self.present_a_page = 0
 
         self.fetch_ticker()
+        self.__fetch_a_next_page_link()
 
     def fetch_ticker(self):
         try:
@@ -51,6 +53,16 @@ class MoneyControl(object):
         except requests. requests.exceptions.RequestException as oe:
             print("Any type of request related error : "+str(oe))
             raise Exception
+
+    def __fetch_a_next_page_link(self):
+
+        # Fetches the template URL for fetching different announcement pages
+        r = requests.get(self.more_anno_link)
+        announcement_soup = bs4.BeautifulSoup(r.content, 'html.parser')
+        # Checking whether the link for the next page is available or not
+        if len(announcement_soup.find("div", attrs={"class":"gray2_11"}).find_all("a")) > 0:
+            a = announcement_soup.find("div", attrs={"class":"gray2_11"}).find_all("a")[0]["href"]
+            self.template_next_announcement_page = PREFIX_URL + a[0:-1]    # Removing the page no. of the given link so that it becomes general link
 
     def fetch_a(self):
 
@@ -86,10 +98,6 @@ class MoneyControl(object):
             if anno_page.find("p", attrs={"class":"PT5"}).find("a"):
                 pdf_link = PREFIX_URL + anno_page.find("p", attrs={"class":"PT5"}).find("a")["href"]
 
-            # Checking whether the link for the next page is available or not
-            if len(announcement_soup.find("div", attrs={"class":"gray2_11"}).find_all("a")) > 0:
-                a = announcement_soup.find("div", attrs={"class":"gray2_11"}).find_all("a")[0]["href"]
-                self.template_next_announcement_page = PREFIX_URL + a[0:-1]    # Removing the page no. of the given link so that it becomes general link
 
             anno = {"link":link, "pdf_link":pdf_link, "content":content, "title":title, "date":date}
             self.announcements.append(anno)
