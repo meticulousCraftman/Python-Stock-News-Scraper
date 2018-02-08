@@ -1,8 +1,7 @@
 
 # Python-News-Scraper
 A program that scrapes for announcements from [moneycontrol.com](www.moneycontrol.com) so that traders can take informed decision.
-
-## Usage
+Here is how to get started,
  
 
     import moneycontrol as mc
