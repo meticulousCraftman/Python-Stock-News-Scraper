@@ -107,8 +107,10 @@ class MoneyControl(object):
                 anno = {"link":link, "pdf_link":pdf_link, "content":content, "title":title, "date":date}
                 self.a.append(anno)
 
-
-            return self.a
+        else:
+            self.a = []
+        
+        return self.a
 
 
     def has_a(self, link):
