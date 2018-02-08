@@ -12,17 +12,16 @@ class MoneyControl(object):
         # Declaring all the instance variable for the class
         self.ticker = ticker
         self.a = []     # Stores the announcements listed on the given page
-        self.announcements_pages = []     # Stores the link of all the pages in the announcement section
         self.more_anno_link = ""    # Link of the announcement page for the company
         self.more_news_link = ""    # Link of news page for the company
         self.template_next_a_page = ""     # For storing the link of the next page of the announcement
-        self.announcement_pages = []    # Stores the list of all the announcement pages.
+        self.a_page_links = []    # Stores the list of links all the announcement pages.
         self.link = ""      # Link to the front page of the company we are looking for on moneycontrol
         self.present_a_page = 0
 
         self.fetch_ticker()
         self.__fetch_a_next_page_link()
-        
+
 
     def fetch_ticker(self):
         try:
@@ -67,45 +66,49 @@ class MoneyControl(object):
             self.template_next_a_page = PREFIX_URL + a[0:-1]    # Removing the page no. of the given link so that it becomes general link
 
 
-    def fetch_a(self):
+    def fetch_a(self, page_no=1):
 
-        r = requests.get(self.more_anno_link)
+        if self.has_a(self.template_next_a_page + str(page_no)):
 
-        announcement_soup = bs4.BeautifulSoup(r.content, 'html.parser')
-        raw_links = announcement_soup.find_all("a", attrs={"class":"bl_15"})
-        
-        # List of links of all the announcements on the given page
-        list_of_links = []
-        for x in raw_links:
-            link = PREFIX_URL + x['href']
-            list_of_links.append(link)
-            a = requests.get(PREFIX_URL + x['href'])
-            anno_page = bs4.BeautifulSoup(a.content, "html.parser")
+            r = requests.get(self.template_next_a_page + str(page_no))
 
-            pdf_link = None
-            title = None
-            content = None
+            self.present_a_page = page_no
 
-            date = next(anno_page.find("p", attrs={"class":"gL_10"}).children)
+            announcement_soup = bs4.BeautifulSoup(r.content, 'html.parser')
+            raw_links = announcement_soup.find_all("a", attrs={"class":"bl_15"})
             
-            # Checking whether the title of the announcement is available or not
-            if anno_page.find("span", attrs={"class":"bl_15"}):
-                title = anno_page.find("span", attrs={"class":"bl_15"}).text
+            # List of links of all the announcements on the given page
+            list_of_links = []
+            for x in raw_links:
+                link = PREFIX_URL + x['href']
+                list_of_links.append(link)
+                a = requests.get(PREFIX_URL + x['href'])
+                anno_page = bs4.BeautifulSoup(a.content, "html.parser")
 
-            # Checking whether content is available or not
-            if anno_page.find("p", attrs={"class":"PT10 b_12"}):
-                content = anno_page.find("p", attrs={"class":"PT10 b_12"}).text
-             
-            # Checking whether the PDF link is availableor not
-            if anno_page.find("p", attrs={"class":"PT5"}).find("a"):
-                pdf_link = PREFIX_URL + anno_page.find("p", attrs={"class":"PT5"}).find("a")["href"]
+                pdf_link = None
+                title = None
+                content = None
+
+                date = next(anno_page.find("p", attrs={"class":"gL_10"}).children)
+                
+                # Checking whether the title of the announcement is available or not
+                if anno_page.find("span", attrs={"class":"bl_15"}):
+                    title = anno_page.find("span", attrs={"class":"bl_15"}).text
+
+                # Checking whether content is available or not
+                if anno_page.find("p", attrs={"class":"PT10 b_12"}):
+                    content = anno_page.find("p", attrs={"class":"PT10 b_12"}).text
+                 
+                # Checking whether the PDF link is availableor not
+                if anno_page.find("p", attrs={"class":"PT5"}).find("a"):
+                    pdf_link = PREFIX_URL + anno_page.find("p", attrs={"class":"PT5"}).find("a")["href"]
 
 
-            anno = {"link":link, "pdf_link":pdf_link, "content":content, "title":title, "date":date}
-            self.a.append(anno)
+                anno = {"link":link, "pdf_link":pdf_link, "content":content, "title":title, "date":date}
+                self.a.append(anno)
 
 
-        return self.a
+            return self.a
 
 
     def has_a(self, link):
@@ -128,6 +131,6 @@ class MoneyControl(object):
         while self.has_a(link):
             link = self.template_next_a_page+str(i)
             print("Page added : "+str(i))
-            self.announcement_pages.append(link)
+            self.a_page_links.append(link)
             i += 1  # Keep incrementing the value of i to check the next page
-        return self.announcement_pages
+        return self.a_page_links
