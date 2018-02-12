@@ -85,9 +85,9 @@ class MoneyControl(object):
                 a = requests.get(PREFIX_URL + x['href'])
                 anno_page = bs4.BeautifulSoup(a.content, "html.parser")
 
-                pdf_link = None
-                title = None
-                content = None
+                pdf_link = ""
+                title = ""
+                content = ""
 
                 date = next(anno_page.find("p", attrs={"class":"gL_10"}).children)
                 
