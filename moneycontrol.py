@@ -70,6 +70,9 @@ class MoneyControl(object):
 
         if self.has_a(self.template_next_a_page + str(page_no)):
 
+            # Clear all the previous data in "a" instance variable
+            self.a = []
+
             r = requests.get(self.template_next_a_page + str(page_no))
 
             self.present_a_page = page_no
@@ -136,3 +139,4 @@ class MoneyControl(object):
             self.a_page_links.append(link)
             i += 1  # Keep incrementing the value of i to check the next page
         return self.a_page_links
+
