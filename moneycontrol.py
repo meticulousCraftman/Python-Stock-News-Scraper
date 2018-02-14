@@ -1,5 +1,6 @@
 import requests
 import bs4
+import pytz
 
 SEARCH_URL = "http://www.moneycontrol.com/stocks/cptmarket/compsearchnew.php?search_data=&cid=&mbsearch_str=&topsearch_type=1&search_str="
 PREFIX_URL = "http://www.moneycontrol.com"
@@ -93,6 +94,8 @@ class MoneyControl(object):
                 content = ""
 
                 date = next(anno_page.find("p", attrs={"class":"gL_10"}).children)
+                date = self.format_date(date)
+
                 
                 # Checking whether the title of the announcement is available or not
                 if anno_page.find("span", attrs={"class":"bl_15"}):
@@ -139,4 +142,32 @@ class MoneyControl(object):
             self.a_page_links.append(link)
             i += 1  # Keep incrementing the value of i to check the next page
         return self.a_page_links
+
+    def format_date(self,datetime):
+        datetime = datetime.split(" ")
+        
+        date = datetime[0].split("-")
+        time = datetime[1]
+
+        date[0] = date[0][:-2]
+        month = {
+            'Jan':'01',
+            'Feb':'02',
+            'Mar':'03',
+            'Apr':'04',
+            'May':'05',
+            'Jun':'06',
+            'Jul':'07',
+            'Aug':'08',
+            'Sep':'09',
+            'Oct':'10',
+            'Nov':'11',
+            'Dec':'12'
+        }
+        date[1] = month[date[1]]
+        date.reverse()
+        date = '-'.join(date)
+        final = date+" "+time
+        return final
+
 
